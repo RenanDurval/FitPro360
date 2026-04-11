@@ -87,7 +87,11 @@ export default function TreinosScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ width: '100%', maxWidth: 800, alignSelf: 'center', flexGrow: 1 }}
+    >
       {/* Header */}
       <LinearGradient
         colors={['rgba(255,107,53,0.2)', 'transparent']}
@@ -233,7 +237,6 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.lg,
-    borderWidth: 1,
     ...Glass.light,
     width: 90,
   },

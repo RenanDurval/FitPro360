@@ -10,10 +10,12 @@ import { Colors, Spacing, FontSize, BorderRadius, Glass } from '../constants/the
 import { saveUserProfile, setOnboardingDone } from '../services/storage';
 import { UserProfile, Sexo, NivelExperiencia, ObjetivoFitness, DiaSemana } from '../types';
 import { MODALIDADES } from '../data/exercicios';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
 
   // Step 0: Dados Básicos
@@ -64,7 +66,7 @@ export default function OnboardingScreen() {
 
   async function handleFinalizar() {
     if (!nome.trim()) {
-      Alert.alert('Nome obrigatório', 'Por favor, preencha seu nome.');
+      Alert.alert(t('onboarding.error_name_title'), t('onboarding.error_name_desc'));
       return;
     }
 
@@ -104,16 +106,16 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
             <Text style={styles.stepEmoji}>👋</Text>
-            <Text style={styles.stepTitle}>Vamos começar!</Text>
-            <Text style={styles.stepDesc}>Conte um pouco sobre você para personalizar sua experiência.</Text>
+            <Text style={styles.stepTitle}>{t('onboarding.start_title')}</Text>
+            <Text style={styles.stepDesc}>{t('onboarding.start_desc')}</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nome</Text>
+              <Text style={styles.inputLabel}>{t('onboarding.name')}</Text>
               <TextInput
                 style={styles.input}
                 value={nome}
                 onChangeText={setNome}
-                placeholder="Seu nome"
+                placeholder={t('onboarding.name_placeholder')}
                 placeholderTextColor={Colors.dark.textMuted}
               />
             </View>
@@ -132,11 +134,11 @@ export default function OnboardingScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Sexo</Text>
+              <Text style={styles.inputLabel}>{t('onboarding.sexo')}</Text>
               <View style={styles.chipRow}>
-                {renderChip('Masculino', sexo === 'masculino', () => setSexo('masculino'))}
-                {renderChip('Feminino', sexo === 'feminino', () => setSexo('feminino'))}
-                {renderChip('Outro', sexo === 'outro', () => setSexo('outro'))}
+                {renderChip(t('onboarding.genero_masculino'), sexo === 'masculino', () => setSexo('masculino'))}
+                {renderChip(t('onboarding.genero_feminino'), sexo === 'feminino', () => setSexo('feminino'))}
+                {renderChip(t('onboarding.genero_outro'), sexo === 'outro', () => setSexo('outro'))}
               </View>
             </View>
           </View>
@@ -146,11 +148,11 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
             <Text style={styles.stepEmoji}>📏</Text>
-            <Text style={styles.stepTitle}>Seu corpo</Text>
-            <Text style={styles.stepDesc}>Dados para calcular seu IMC e necessidades calóricas.</Text>
+            <Text style={styles.stepTitle}>{t('onboarding.body_title')}</Text>
+            <Text style={styles.stepDesc}>{t('onboarding.body_desc')}</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Data de Nascimento</Text>
+              <Text style={styles.inputLabel}>{t('onboarding.birth')}</Text>
               <TextInput
                 style={styles.input}
                 value={dataNascimento}
@@ -162,7 +164,7 @@ export default function OnboardingScreen() {
 
             <View style={styles.rowInputs}>
               <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={styles.inputLabel}>Altura (cm)</Text>
+                <Text style={styles.inputLabel}>{t('onboarding.height')}</Text>
                 <TextInput
                   style={styles.input}
                   value={altura}
@@ -173,7 +175,7 @@ export default function OnboardingScreen() {
                 />
               </View>
               <View style={[styles.inputGroup, { flex: 1 }]}>
-                <Text style={styles.inputLabel}>Peso (kg)</Text>
+                <Text style={styles.inputLabel}>{t('onboarding.weight')}</Text>
                 <TextInput
                   style={styles.input}
                   value={peso}
@@ -191,15 +193,15 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
             <Text style={styles.stepEmoji}>🎯</Text>
-            <Text style={styles.stepTitle}>Objetivos & Nível</Text>
-            <Text style={styles.stepDesc}>O que você quer alcançar?</Text>
+            <Text style={styles.stepTitle}>{t('onboarding.goals_title')}</Text>
+            <Text style={styles.stepDesc}>{t('onboarding.goals_desc')}</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Nível de Experiência</Text>
+              <Text style={styles.inputLabel}>{t('onboarding.level')}</Text>
               <View style={styles.chipRow}>
                 {['iniciante', 'intermediario', 'avancado', 'profissional'].map(n =>
                   renderChip(
-                    n.charAt(0).toUpperCase() + n.slice(1),
+                    t(`onboarding.levels.${n}` as any),
                     nivel === n,
                     () => setNivel(n as NivelExperiencia),
                   )
@@ -274,16 +276,16 @@ export default function OnboardingScreen() {
         return (
           <View style={styles.stepContent}>
             <Text style={styles.stepEmoji}>🏥</Text>
-            <Text style={styles.stepTitle}>Saúde</Text>
-            <Text style={styles.stepDesc}>Importante para a segurança do seu treino. Separe por vírgula.</Text>
+            <Text style={styles.stepTitle}>{t('onboarding.health_title')}</Text>
+            <Text style={styles.stepDesc}>{t('onboarding.health_desc')}</Text>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>Doenças / Condições (opcional)</Text>
+              <Text style={styles.inputLabel}>{t('onboarding.diseases')}</Text>
               <TextInput
                 style={styles.input}
                 value={doencas}
                 onChangeText={setDoencas}
-                placeholder="Ex: hipertensão, diabetes"
+                placeholder={t('onboarding.diseases_ph')}
                 placeholderTextColor={Colors.dark.textMuted}
               />
             </View>
@@ -356,7 +358,7 @@ export default function OnboardingScreen() {
         {step > 0 && (
           <TouchableOpacity style={styles.backBtn} onPress={() => setStep(step - 1)}>
             <Ionicons name="arrow-back" size={20} color={Colors.dark.textSecondary} />
-            <Text style={styles.backText}>Voltar</Text>
+            <Text style={styles.backText}>{t('onboarding.btn_back')}</Text>
           </TouchableOpacity>
         )}
         <View style={{ flex: 1 }} />
@@ -374,7 +376,7 @@ export default function OnboardingScreen() {
             end={{ x: 1, y: 0 }}
           >
             <Text style={styles.nextText}>
-              {step === totalSteps - 1 ? 'Finalizar' : 'Próximo'}
+              {step === totalSteps - 1 ? t('onboarding.btn_finish') : t('onboarding.btn_next')}
             </Text>
             <Ionicons name={step === totalSteps - 1 ? 'checkmark' : 'arrow-forward'} size={20} color="#000" />
           </LinearGradient>

@@ -2,13 +2,17 @@ import { Tabs } from 'expo-router';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { View, StyleSheet } from 'react-native';
 import { Colors } from '../../constants/theme';
+import { useTranslation } from 'react-i18next';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [styles.tabBar, { height: 65 + insets.bottom, paddingBottom: 8 + insets.bottom }],
         tabBarActiveTintColor: Colors.primary,
         tabBarInactiveTintColor: Colors.dark.textMuted,
         tabBarLabelStyle: styles.tabLabel,
@@ -17,7 +21,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Início',
+          title: t('tabs.inicio'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
@@ -26,7 +30,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="treinos"
         options={{
-          title: 'Treinos',
+          title: t('tabs.treinos'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="dumbbell" size={size} color={color} />
           ),
@@ -35,7 +39,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="nutricao"
         options={{
-          title: 'Nutrição',
+          title: t('tabs.nutricao'),
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="food-apple" size={size} color={color} />
           ),
@@ -44,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="mapa"
         options={{
-          title: 'Locais',
+          title: t('tabs.locais'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="map" size={size} color={color} />
           ),
@@ -53,7 +57,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="perfil"
         options={{
-          title: 'Perfil',
+          title: t('tabs.perfil'),
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person" size={size} color={color} />
           ),

@@ -2,7 +2,9 @@
 // FitPro360 - Storage Service (AsyncStorage)
 // ============================================
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { UserProfile, ProgramaTreino, PlanoDieta, Profissional, SensorData, AtividadeGPS, DispositivoBLE } from '../types';
+import { supabase } from './supabase';
 
 const KEYS = {
   USER_PROFILE: '@fitpro360_user',
@@ -19,11 +21,81 @@ const KEYS = {
 // ==================== USER PROFILE ====================
 export async function saveUserProfile(user: UserProfile): Promise<void> {
   user.updatedAt = new Date().toISOString();
-  await AsyncStorage.setItem(KEYS.USER_PROFILE, JSON.stringify(user));
+  await SecureStore.setItemAsync(KEYS.USER_PROFILE, JSON.stringify(user));
+
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session?.user) {
+      const { error } = await supabase.from('profiles').upsert({
+        id: sessionData.session.user.id,
+        nome: user.nome,
+        sexo: user.sexo,
+        data_nascimento: user.dataNascimento,
+        peso: user.peso,
+        altura: user.altura,
+        nivel: user.nivelExperiencia,
+        objetivos: user.objetivos,
+        modalidades: user.modalidadesPreferidas,
+        dias_treino: user.diasDisponiveis,
+        doencas: user.condicaoSaude?.doencas,
+        medicamentos: user.condicaoSaude?.medicamentos,
+        suplementos: user.condicaoSaude?.suplementos,
+        alergias: user.condicaoSaude?.alergias,
+        onboarding_feito: true
+      });
+      if (error) console.log('Supabase Sync Error:', error);
+    }
+  } catch (err) {
+    console.log('Network/Sync error', err);
+  }
 }
 
 export async function getUserProfile(): Promise<UserProfile | null> {
-  const data = await AsyncStorage.getItem(KEYS.USER_PROFILE);
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    if (sessionData?.session?.user) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', sessionData.session.user.id)
+        .single();
+
+      if (profile && profile.onboarding_feito) {
+        const user: UserProfile = {
+          id: profile.id,
+          nome: profile.nome,
+          email: sessionData.session.user.email || '',
+          sexo: profile.sexo,
+          dataNascimento: profile.data_nascimento,
+          peso: profile.peso,
+          altura: profile.altura,
+          nivelExperiencia: profile.nivel,
+          objetivos: profile.objetivos || [],
+          modalidadesPreferidas: profile.modalidades || [],
+          diasDisponiveis: profile.dias_treino || [],
+          condicaoSaude: {
+            doencas: profile.doencas || [],
+            deficiencias: [],
+            medicamentos: profile.medicamentos || [],
+            suplementos: profile.suplementos || [],
+            vitaminas: [],
+            alergias: profile.alergias || [],
+            restricoesAlimentares: []
+          },
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        // Mantém sincronizado offline localmente
+        await SecureStore.setItemAsync(KEYS.USER_PROFILE, JSON.stringify(user));
+        return user;
+      }
+    }
+  } catch (err) {
+    console.log('Fallback to offline DB');
+  }
+
+  // Fallback offline se sem internet ou sem sessão profile
+  const data = await SecureStore.getItemAsync(KEYS.USER_PROFILE);
   return data ? JSON.parse(data) : null;
 }
 
@@ -121,6 +193,7 @@ export async function isOnboardingDone(): Promise<boolean> {
 
 // ==================== RESET (DEBUG) ====================
 export async function resetAllData(): Promise<void> {
-  const keys = Object.values(KEYS);
+  const keys = Object.values(KEYS).filter(k => k !== KEYS.USER_PROFILE);
   await AsyncStorage.multiRemove(keys);
+  await SecureStore.deleteItemAsync(KEYS.USER_PROFILE);
 }

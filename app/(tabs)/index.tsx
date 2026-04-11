@@ -11,6 +11,7 @@ import { getUserProfile } from '../../services/storage';
 import { getSimulatedSensorData } from '../../services/sensors';
 import { UserProfile, SensorData, ProgramaTreino } from '../../types';
 import { getProgramasTreino } from '../../services/storage';
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -44,6 +45,7 @@ function ProgressRing({ value, max, size = 80, color = Colors.primary, label, un
 }
 
 export default function DashboardScreen() {
+  const { t } = useTranslation();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [sensorData, setSensorData] = useState<SensorData | null>(null);
   const [treinos, setTreinos] = useState<ProgramaTreino[]>([]);
@@ -72,9 +74,9 @@ export default function DashboardScreen() {
 
   const greeting = () => {
     const h = new Date().getHours();
-    if (h < 12) return 'Bom dia';
-    if (h < 18) return 'Boa tarde';
-    return 'Boa noite';
+    if (h < 12) return t('dashboard.bom_dia');
+    if (h < 18) return t('dashboard.boa_tarde');
+    return t('dashboard.boa_noite');
   };
 
   const treinoDoDia = treinos.length > 0 ? treinos[treinos.length - 1] : null;
@@ -85,7 +87,7 @@ export default function DashboardScreen() {
   return (
     <ScrollView
       style={styles.container}
-      contentContainerStyle={styles.content}
+      contentContainerStyle={[styles.content, { alignSelf: 'center', width: '100%', maxWidth: 800 }]}
       refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />}
       showsVerticalScrollIndicator={false}
     >
@@ -99,7 +101,7 @@ export default function DashboardScreen() {
         <View style={styles.headerTop}>
           <View>
             <Text style={styles.greeting}>{greeting()}, 💪</Text>
-            <Text style={styles.userName}>{user?.nome || 'Atleta'}</Text>
+            <Text style={styles.userName}>{user?.nome || t('dashboard.atleta')}</Text>
           </View>
           <TouchableOpacity
             style={styles.notifButton}
@@ -114,7 +116,7 @@ export default function DashboardScreen() {
           <View style={styles.metricItem}>
             <Ionicons name="footsteps" size={20} color="#55EFC4" />
             <Text style={styles.metricValue}>{sensorData?.passos?.toLocaleString() || '0'}</Text>
-            <Text style={styles.metricLabel}>passos</Text>
+            <Text style={styles.metricLabel}>{t('dashboard.passos')}</Text>
           </View>
           <View style={styles.metricDivider} />
           <View style={styles.metricItem}>
@@ -139,7 +141,7 @@ export default function DashboardScreen() {
 
       {/* Treino do Dia */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🏋️ Treino de Hoje</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.treino_hoje')}</Text>
         {treinoHoje ? (
           <TouchableOpacity onPress={() => router.push('/treino-detalhe')}>
             <GlassCard>
@@ -151,7 +153,7 @@ export default function DashboardScreen() {
                   <View>
                     <Text style={styles.treinoTitulo}>{treinoHoje.titulo}</Text>
                     <Text style={styles.treinoInfo}>
-                      {treinoHoje.exercicios.length} exercícios • {treinoHoje.duracaoEstimada} min
+                      {treinoHoje.exercicios.length} {t('dashboard.exercicios')} • {treinoHoje.duracaoEstimada} min
                     </Text>
                   </View>
                   <View style={styles.caloriaBadge}>
@@ -169,12 +171,12 @@ export default function DashboardScreen() {
                   ))}
                   {treinoHoje.exercicios.length > 4 && (
                     <Text style={styles.maisExercicios}>
-                      + {treinoHoje.exercicios.length - 4} mais exercícios
+                      {t('dashboard.mais_exercicios', { count: treinoHoje.exercicios.length - 4 })}
                     </Text>
                   )}
                 </View>
                 <View style={styles.iniciarBtn}>
-                  <Text style={styles.iniciarText}>INICIAR TREINO</Text>
+                  <Text style={styles.iniciarText}>{t('dashboard.iniciar_treino')}</Text>
                   <Ionicons name="play-circle" size={24} color={Colors.primary} />
                 </View>
               </LinearGradient>
@@ -184,12 +186,12 @@ export default function DashboardScreen() {
           <GlassCard>
             <View style={styles.emptyTreino}>
               <MaterialCommunityIcons name="dumbbell" size={48} color={Colors.dark.textMuted} />
-              <Text style={styles.emptyText}>Nenhum treino gerado ainda</Text>
+              <Text style={styles.emptyText}>{t('dashboard.nenhum_treino')}</Text>
               <TouchableOpacity
                 style={styles.gerarBtn}
                 onPress={() => router.push('/(tabs)/treinos')}
               >
-                <Text style={styles.gerarBtnText}>Gerar Programa de Treino</Text>
+                <Text style={styles.gerarBtnText}>{t('dashboard.gerar_treino')}</Text>
               </TouchableOpacity>
             </View>
           </GlassCard>
@@ -198,13 +200,13 @@ export default function DashboardScreen() {
 
       {/* Quick Actions */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>⚡ Acesso Rápido</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.acesso_rapido')}</Text>
         <View style={styles.quickActions}>
           {[
-            { icon: 'person-outline', label: 'Profissionais', color: '#A29BFE', route: '/profissionais' },
-            { icon: 'bluetooth', label: 'Dispositivos', color: '#74B9FF', route: '/dispositivos' },
-            { icon: 'map-outline', label: 'Locais', color: '#55EFC4', route: '/(tabs)/mapa' },
-            { icon: 'nutrition-outline', label: 'Dieta', color: '#FDCB6E', route: '/(tabs)/nutricao' },
+            { icon: 'person-outline', label: t('dashboard.quick_profissionais'), color: '#A29BFE', route: '/profissionais' },
+            { icon: 'bluetooth', label: t('dashboard.quick_dispositivos'), color: '#74B9FF', route: '/dispositivos' },
+            { icon: 'map-outline', label: t('dashboard.quick_locais'), color: '#55EFC4', route: '/(tabs)/mapa' },
+            { icon: 'nutrition-outline', label: t('dashboard.quick_dieta'), color: '#FDCB6E', route: '/(tabs)/nutricao' },
           ].map((item, i) => (
             <TouchableOpacity
               key={i}
@@ -222,10 +224,10 @@ export default function DashboardScreen() {
 
       {/* Progresso Semanal */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📊 Progresso Semanal</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.progresso_semanal')}</Text>
         <GlassCard>
           <View style={styles.weekProgress}>
-            {['S', 'T', 'Q', 'Q', 'S', 'S', 'D'].map((d, i) => {
+            {(t('dashboard.dias_semana', { returnObjects: true }) as string[]).map((d, i) => {
               const isToday = i === new Date().getDay() - 1 || (new Date().getDay() === 0 && i === 6);
               const isDone = i < new Date().getDay() && Math.random() > 0.3;
               return (
@@ -247,23 +249,23 @@ export default function DashboardScreen() {
 
       {/* Tempo Ativo */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>⏱️ Atividade do Dia</Text>
+        <Text style={styles.sectionTitle}>{t('dashboard.atividade_dia')}</Text>
         <GlassCard>
           <View style={styles.activityRow}>
             <View style={styles.activityItem}>
               <Ionicons name="time-outline" size={28} color={Colors.primary} />
               <Text style={styles.activityValue}>{sensorData?.tempoAtivo || 0} min</Text>
-              <Text style={styles.activityLabel}>Tempo Ativo</Text>
+              <Text style={styles.activityLabel}>{t('dashboard.tempo_ativo')}</Text>
             </View>
             <View style={styles.activityItem}>
               <Ionicons name="trending-up" size={28} color="#FF6B35" />
               <Text style={styles.activityValue}>{sensorData?.frequenciaCardiaca || '--'} bpm</Text>
-              <Text style={styles.activityLabel}>FC Média</Text>
+              <Text style={styles.activityLabel}>{t('dashboard.fc_media')}</Text>
             </View>
             <View style={styles.activityItem}>
               <Ionicons name="water-outline" size={28} color="#74B9FF" />
               <Text style={styles.activityValue}>2.1 L</Text>
-              <Text style={styles.activityLabel}>Água</Text>
+              <Text style={styles.activityLabel}>{t('dashboard.agua')}</Text>
             </View>
           </View>
         </GlassCard>

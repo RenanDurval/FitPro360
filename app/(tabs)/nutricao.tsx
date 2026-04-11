@@ -48,7 +48,11 @@ export default function NutricaoScreen() {
   };
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView 
+      style={styles.container} 
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={{ width: '100%', maxWidth: 800, alignSelf: 'center', flexGrow: 1 }}
+    >
       {/* Header */}
       <LinearGradient
         colors={['rgba(253,203,110,0.2)', 'transparent']}
